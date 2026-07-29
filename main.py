@@ -16,6 +16,7 @@ from UI.UI_MainChartingTab import MainChartingWindow
 import shelve
 from AI.AI_Data import Machine_learning
 from Auxilliary.My_Stock_shelve import Stock_shelve as ss
+import Auxilliary.network_Status as network_status
 
 class MainWindow(QMainWindow):
 
@@ -29,7 +30,7 @@ class MainWindow(QMainWindow):
         toolbar = QToolBar("My main toolbar")
         toolbar.setIconSize(QSize(32, 32))
         self.addToolBar(toolbar)
-
+        self.Online = None
         self.setWindowTitle('StocKraze')
         self.tabs = QTabWidget()
         self.tabs.setMovable(True)
@@ -73,8 +74,16 @@ class MainWindow(QMainWindow):
         AI.setShortcut(QKeySequence("Ctrl+f"))
         toolbar.addAction(AI)
 
-
+        self.get_network_status()
         self.new_stock = None
+
+    def get_network_status(self):
+        self.Online = network_status.get_status()
+        if network_status.is_online():
+            print(str(self.Online)+" Connected to the internet.")
+        else:
+            print(str(self.Online)+" No internet connection.")
+
 
     def Home_tab(self):
         self.tabs.addTab(Home_Tab(),QIcon('Source Images/home.png'),'Home')
