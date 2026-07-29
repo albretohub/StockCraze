@@ -40,7 +40,7 @@ class MyStockTabs(QWidget):
         self.stocksymbol = QLabel(StockSymbol)
         self.stocksymbol.setFont(self.font)
         self.stocksymbol.setMargin(10)
-        self.stocksymbol.setStyleSheet("qproperty-alignment: AlignCenter; background-color: Grey")
+        #self.stocksymbol.setStyleSheet("qproperty-alignment: AlignCenter; background-color: Grey")
         self.stockname = QLabel(StockName)
         self.stockname.setFont(self.font2)
 
@@ -68,7 +68,7 @@ class MyStockTabs(QWidget):
         self.status.setFont(self.font3)
 
 
-        self.refresh = QPushButton(QIcon("refresh.jpg"),"Refresh")
+        self.refresh = QPushButton(QIcon("Source Images/refresh.jpg"),"Refresh")
         self.refresh.setFixedSize(150,50)
         self.refresh.pressed.connect(self.Refresh)
 
@@ -122,6 +122,10 @@ class MyStockTabs(QWidget):
         self.stockname.setText("Name: "+str(StockProfile.companyName))
         self.status.setText("Status: "+ str(StocKStatList[7]))
         #self.percentChangeLabel.setText("%Change: "+str((StocKStatList[2]-StocKStatList[3])/StocKStatList[3]))
+        if StocKStatList[7] == "Online":
+            self.stocksymbol.setStyleSheet("qproperty-alignment: AlignCenter; background-color: lightgreen")
+        else:
+            self.stocksymbol.setStyleSheet("qproperty-alignment: AlignCenter; background-color: Grey")
 
         return StocKStatList
 
