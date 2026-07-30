@@ -4,13 +4,14 @@ import datetime
 from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout, QVBoxLayout,QLabel,QHBoxLayout
 from PyQt5.QtGui import QIcon, QFont
 from Auxilliary.StockData_Historical import StockDataHist as sd
-
+import Auxilliary.network_Status as network_status
 
 class MyStockTabs(QWidget):
     def __init__(self,StockSymbol,StockName):
         super().__init__()
         self.StockSymbol = StockSymbol
         self.StockName = StockName
+        self.Online = None
 
         self.today = datetime.datetime.now()
         self.todayString = self.today.strftime("%B %d,%Y %H:%M:%S")
@@ -97,20 +98,25 @@ class MyStockTabs(QWidget):
         self.layout1.addLayout(self.layout3)
         self.layout1.addLayout(self.layout4)
         self.setLayout(self.layout1)
-
         self.StockStats(self.StockName,self.StockSymbol)# data fetches from database
+
 
     def StockStats(self,Stockname,StockSymbol):
         #This function must return a list type variable from database
         #example StocKStatList = [week52high,week52High, PriceToday ,PriceYesterday,Sector,Country,marketcap]
 
-        StockProfile = sd(self.StockSymbol,'1d','1m')
-        StockProfile.Stock_Info()
-
         #StockProfile.show()
-
-        StocKStatList = [StockProfile.FiftyWeekLow,StockProfile.FiftyWeekHigh,StockProfile.currentPrice,
+        self.get_network_status()
+        if self.Online == "Online" :
+                    StockProfile = sd(self.StockSymbol,'1d','1m')
+                    StockProfile.Stock_Info()
+                    self.stockname.setText("Name: "+str(StockProfile.companyName))
+                    StocKStatList = [StockProfile.FiftyWeekLow,StockProfile.FiftyWeekHigh,StockProfile.currentPrice,
                          StockProfile.TodayOnlyVolume,StockProfile.sector,StockProfile.country,StockProfile.marketCap,StockProfile.status]
+
+        else:
+            StocKStatList = [None] * 8
+            self.stockname.setText("Name: None")
 
         self.marketCapLabel.setText("Market Capital: " +str(StocKStatList[6]))
         self.sectorLabel.setText("Sector: " +str(StocKStatList[4]))
@@ -119,12 +125,13 @@ class MyStockTabs(QWidget):
         self.week52HighLabel.setText("52-Week High: " +str(StocKStatList[1]))
         self.priceTodayLabel.setText("Current Closing Price: " +str(StocKStatList[2]))
         self.TodayVolume.setText("Today's Volume: " +str(StocKStatList[3]))
-        self.stockname.setText("Name: "+str(StockProfile.companyName))
-        self.status.setText("Status: "+ str(StocKStatList[7]))
+
         #self.percentChangeLabel.setText("%Change: "+str((StocKStatList[2]-StocKStatList[3])/StocKStatList[3]))
         if StocKStatList[7] == "Online":
+            self.status.setText("Status: "+ str(StocKStatList[7]))
             self.stocksymbol.setStyleSheet("qproperty-alignment: AlignCenter; background-color: lightgreen")
         else:
+            self.status.setText("Status: Offline")
             self.stocksymbol.setStyleSheet("qproperty-alignment: AlignCenter; background-color: Grey")
 
         return StocKStatList
@@ -135,6 +142,13 @@ class MyStockTabs(QWidget):
         date = today.strftime("%B %d,%Y %H:%M:%S")
         self.dateToday.setText("As of "+str(date))
         self.StockStats(self.StockName,self.StockSymbol)# data fetches from database
+
+    def get_network_status(self):
+        self.Online = network_status.get_status()
+        if network_status.is_online():
+            print(str(self.Online)+" Connected to the internet.")
+        else:
+            print(str(self.Online)+" No internet connection.")
 
 
 
