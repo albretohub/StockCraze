@@ -96,7 +96,7 @@ class HistoricalPrice_Tab_CSV(QWidget):# data fetched online using CSV files dow
         self.main_layout.addLayout(self.layout1)
         self.main_layout.addLayout(self.layout2)
 
-class HistoricalPrice_Tab_Database(QWidget):# data fetched online using data from database
+class HistoricalPrice_Tab_Database(QWidget):# data fetched using data from database
     def __init__(self,StockSymbol,StockName):#retrive all data available.
         super().__init__()
         self.StockSymbol = StockSymbol
