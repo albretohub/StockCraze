@@ -32,24 +32,97 @@ class HistoricalPrice_Tab(QWidget):# data fetched online using yfinance module v
         self.StockSymbol = StockSymbol
         self.StockName = StockName
         self.table = QtWidgets.QTableView()
+        self.label = QLabel()
+        self.data_frame = None
 
-        data = sd(self.StockSymbol,'1mo','1d')
-        data.load_data()
-        #data.show()
-        data = data.history_dataframe.drop('Dividends',axis =1)
-        data = data.drop('Stock Splits',axis =1)
-        indexes = data.index.strftime("%B %d,%Y")
-        data.index = indexes
-        data = data.round(4)
-        print("Helo")
+        self.main_layout = QHBoxLayout()
+        self.main_layout.setSpacing(1)
+
+        self.layout1 = QVBoxLayout()#layout for the table
+        self.layout2 = QVBoxLayout()#layout for the stats
+
+        self.layout1 = QVBoxLayout()#layout for the table
+        self.layout2 = QVBoxLayout()#layout for the stats
+
+        self.TitleStats = QLabel("  QuickStats")
+        self.TitleStats.setFont(QFont("Arial",30,10,False))
+        self.TitleStats.setStyleSheet("qproperty-alignment: AlignCenter; background-color: Green; color: Yellow")
+
+        self.NumEntriesLabel = QLabel()
+        self.NumEntriesLabel.setFont(QFont("Arial",12))
+        self.NumEntriesLabel.setStyleSheet("qproperty-alignment: AlignCenter; background-color: grey")
+        self.NumEntries = None
+
+        self.DateRangeLabel =  QLabel()
+        self.DateRangeLabel.setFont(QFont("Arial",12))
+        self.DateRangeLabel.setStyleSheet("qproperty-alignment: AlignCenter; background-color: grey; font: white")
+
+        self.HighestClosingPringrice = QLabel()
+        self.HighestClosingPringrice.setFont(QFont("Arial",10))
+        self.HighestClosingPringrice.setStyleSheet("qproperty-alignment: AlignCenter; background-color: White; font:Bold")
+
+        self.LowestClosingPrice = QLabel()
+        self.LowestClosingPrice.setFont(QFont("Arial",10))
+        self.LowestClosingPrice.setStyleSheet("qproperty-alignment: AlignCenter; background-color: Red; font:Bold")
+
+        self.HighestVolume = QLabel()
+        self.HighestVolume.setFont(QFont("Arial",10))
+        self.HighestVolume.setStyleSheet("qproperty-alignment: AlignCenter; background-color: white; font:Bold")
+
+        self.LowestVolume = QLabel()
+        self.LowestVolume.setFont(QFont("Arial",10))
+        self.LowestVolume.setStyleSheet("qproperty-alignment: AlignCenter; background-color: red; font:Bold")
+
+        self.OpenAv = QLabel()
+        self.OpenAv.setFont(QFont("Arial",10))
+        self.OpenAv.setStyleSheet("qproperty-alignment: AlignCenter; background-color: cyan; font:Bold")
+
+        self.HighAv = QLabel()
+        self.HighAv.setFont(QFont("Arial",10))
+        self.HighAv.setStyleSheet("qproperty-alignment: AlignCenter; background-color: cyan; font:Bold")
+
+        self.LowAv = QLabel()
+        self.LowAv.setFont(QFont("Arial",10))
+        self.LowAv.setStyleSheet("qproperty-alignment: AlignCenter; background-color: cyan; font:Bold")
+
+        self.CloseAv = QLabel()
+        self.CloseAv.setFont(QFont("Arial",10))
+        self.CloseAv.setStyleSheet("qproperty-alignment: AlignCenter; background-color: cyan; font:Bold")
+
+        self.VolumeAv = QLabel()
+        self.VolumeAv.setFont(QFont("Arial",10))
+        self.VolumeAv.setStyleSheet("qproperty-alignment: AlignCenter; background-color: cyan; font:Bold")
 
 
+        try:
+            data = sd(self.StockSymbol,'1mo','1d')
+            data.load_data()
+            data.show()
+            data = data.history_dataframe.drop('Dividends',axis =1)
+            data = data.drop('Stock Splits',axis =1)
+            indexes = data.index.strftime("%B %d,%Y")
+            data.index = indexes
+            data = data.round(4)
+            self.data_frame = data
+            self.model = TableModel(data)
+            self.table.setModel(self.model)
+            self.layout1.addWidget(self.table)
+            print("Helo")
 
-        self.model = TableModel(data)
-        self.table.setModel(self.model)
-        self.layout1 = QVBoxLayout()
-        self.layout1.addWidget(self.table)
-        self.setLayout(self.layout1)
+        except Exception as e:
+            print("Importing data error! "+ str(e))
+            self.label.setText("data not found ")
+            self.layout1.addWidget(self.label)
+
+        self.layout2.addWidget(self.TitleStats)
+        self.NumEntries = len(self.data_frame)
+        self.NumEntriesLabel.setText("Number of Entries: "+str(self.NumEntries))
+        self.layout2.addWidget(self.NumEntriesLabel)
+
+        self.setLayout(self.main_layout)
+        self.main_layout.addLayout(self.layout1)
+        self.main_layout.addLayout(self.layout2)
+        #self.setLayout(self.layout1)
 
 
 class HistoricalPrice_Tab_CSV(QWidget):# data fetched online using CSV files downloaded

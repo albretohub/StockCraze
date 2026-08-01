@@ -8,9 +8,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QToo
 from UI.UI_Home_tab_widget import Home_Tab
 from UI.UI_Tab_widgets import Tabs
 from UI.UI_mystocks_tab import MyStockTabs
-from UI.UI_HistoricalPricesTab import HistoricalPrice_Tab_Database
+from UI.UI_HistoricalPricesTab import*
 from UI.UI_MainChartingTab import MainChartingWindow
-#from UI_HistoricalPricesTab import HistoricalPrice_Tab_CSV
 #from UI_ChartingTab import MainChart
 
 import shelve
@@ -121,9 +120,9 @@ class MainWindow(QMainWindow):
         selectedStock, ok =  MystockDialog.getItem(self, "Select Stock", "My Stocks", nameAndticker, 0, False)
         if ok :
             stockName ,ticker= selectedStock.split("-")
-            #self.tabs.addTab(HistoricalPrice_Tab(ticker,stockName),QIcon("chart-up.png"),ticker) # will be used if internet access is available
+            self.tabs.addTab(HistoricalPrice_Tab(ticker,stockName),QIcon("chart-up.png"),ticker) # will be used if internet access is available
             #self.tabs.addTab(HistoricalPrice_Tab_CSV(ticker,stockName),QIcon("chart-up.png"),ticker) # will be used if internet access is not available
-            self.tabs.addTab(HistoricalPrice_Tab_Database(ticker,stockName),QIcon("Source Images/chart-up.png"),ticker)
+            #self.tabs.addTab(HistoricalPrice_Tab_Database(ticker,stockName),QIcon("Source Images/chart-up.png"),ticker)
             self.RecentStock = shelve.open('Data/Recent_Stock_data')
             current_stock = stockName + "(" + ticker + ")"
             self.RecentStock['recent'] = current_stock
