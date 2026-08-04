@@ -97,17 +97,22 @@ class HistoricalPrice_Tab(QWidget):# data fetched online using yfinance module v
         try:
             data = sd(self.StockSymbol,'1mo','1d')
             data.load_data()
-            data.show()
+            #data.show()
             data = data.history_dataframe.drop('Dividends',axis =1)
             data = data.drop('Stock Splits',axis =1)
             indexes = data.index.strftime("%B %d,%Y")
             data.index = indexes
             data = data.round(4)
-            self.data_frame = data
-            self.model = TableModel(data)
-            self.table.setModel(self.model)
-            self.layout1.addWidget(self.table)
-            print("Helo")
+            self.data_frame = pd.DataFrame(data)
+           # print(self.data_frame)
+
+
+            if len(self.data_frame)!= 0 :
+                self.model = TableModel(self.data_frame)
+                self.table.setModel(self.model)
+                self.layout1.addWidget(self.table)
+            else:
+                raise Exception
 
         except Exception as e:
             print("Importing data error! "+ str(e))
@@ -118,6 +123,53 @@ class HistoricalPrice_Tab(QWidget):# data fetched online using yfinance module v
         self.NumEntries = len(self.data_frame)
         self.NumEntriesLabel.setText("Number of Entries: "+str(self.NumEntries))
         self.layout2.addWidget(self.NumEntriesLabel)
+
+        Dates = self.data_frame.index.tolist()
+        self.DateRangeLabel.setText("Date range: "+ str(Dates[0])+" - "+str(Dates[len(Dates)-1]))
+        self.layout2.addWidget(self.DateRangeLabel)
+
+        maxClosePrice = self.data_frame["Close"].values.max()
+        indexmax = self.data_frame['Close'].idxmax()
+
+        self.HighestClosingPringrice.setText("Highest Closing Price: "+str(maxClosePrice) +" at "+str(indexmax))
+        self.layout2.addWidget(self.HighestClosingPringrice)
+
+
+        minClosePrice = self.data_frame["Close"].values.min()
+        indexmin = self.data_frame['Close'].idxmin()
+        self.LowestClosingPrice.setText("Lowest Closing Price: "+str(minClosePrice) +" at "+str(indexmin))
+        self.layout2.addWidget(self.LowestClosingPrice)
+
+        highestVol = self.data_frame['Volume'].values.max()
+        indexmax = self.data_frame['Volume'].idxmax()
+        self.HighestVolume.setText("Highest Volume: "+str(highestVol) + " at "+str(indexmax))
+        self.layout2.addWidget(self.HighestVolume)
+
+        lowestVol = self.data_frame['Volume'].values.min()
+        indexmin = self.data_frame['Volume'].idxmin()
+        self.LowestVolume.setText("Lowest Volume: "+str(lowestVol) + " at "+str(indexmin))
+        self.layout2.addWidget(self.LowestVolume)
+
+        average = float(self.data_frame['Open'].values.mean()).__round__(2)
+        self.OpenAv.setText("Average Opening price: "+ str(average))
+        self.OpenAv.setWordWrap(True)
+        self.layout2.addWidget(self.OpenAv)
+
+        average = float(self.data_frame['High'].values.mean()).__round__(2)
+        self.HighAv.setText("Average High price: "+ str(average))
+        self.layout2.addWidget(self.HighAv)
+
+        average = float(self.data_frame['Low'].values.mean()).__round__(2)
+        self.LowAv.setText("Average Low price: "+ str(average))
+        self.layout2.addWidget(self.LowAv)
+
+        average = float(self.data_frame['Close'].values.mean()).__round__(2)
+        self.CloseAv.setText("Average Closing price: "+ str(average))
+        self.layout2.addWidget(self.CloseAv)
+
+        average = self.data_frame['Volume'].values.mean()
+        self.VolumeAv.setText("Average Volume: "+ str(average))
+        self.layout2.addWidget(self.VolumeAv)
 
         self.setLayout(self.main_layout)
         self.main_layout.addLayout(self.layout1)
