@@ -108,7 +108,7 @@ class MyStockTabs(QWidget):
         #StockProfile.show()
         self.get_network_status()
         if self.Online == "Online" :
-                    StockProfile = sd(self.StockSymbol,'1d','1m')
+                    StockProfile = sd(self.StockSymbol,'1d',None,None,'1m')
                     StockProfile.Stock_Info()
                     self.stockname.setText("Name: "+str(StockProfile.companyName))
                     StocKStatList = [StockProfile.FiftyWeekLow,StockProfile.FiftyWeekHigh,StockProfile.currentPrice,

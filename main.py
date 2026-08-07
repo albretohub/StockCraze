@@ -15,6 +15,8 @@ from UI.UI_MainChartingTab import MainChartingWindow
 import shelve
 from AI.AI_Data import Machine_learning
 from Auxilliary.My_Stock_shelve import Stock_shelve as ss
+from Auxilliary.Date_Input import DateRangeDialog as dr
+from Auxilliary.Date_Input import IntervalDialog as id
 
 
 class MainWindow(QMainWindow):
@@ -97,6 +99,7 @@ class MainWindow(QMainWindow):
         MystockDialog.setFixedSize(500,200)
 
         selectedStock, ok =  MystockDialog.getItem(self, "Select Stock", "My Stocks", nameAndticker, 0, False)
+
         if ok :
             stockName ,ticker= selectedStock.split("-")
             self.tabs.addTab(MyStockTabs(ticker,stockName),QIcon("Source Images/chart-up.png"),ticker)
@@ -118,9 +121,25 @@ class MainWindow(QMainWindow):
         MystockDialog.setFixedSize(500,200)
 
         selectedStock, ok =  MystockDialog.getItem(self, "Select Stock", "My Stocks", nameAndticker, 0, False)
+
+        start, end, ok2 = dr.getDateRange(title="Choose Report Dates")
+        input_start = start.toString("yyyy-MM-dd")
+        input_end = end.toString("yyyy-MM-dd")
+        input_interval = '1d'
+
+        if ok2:
+            interval, ok2 = id.getInterval()
+            input_interval = interval
+            if ok2:
+                print("Start: "+input_start)
+                print("End:  "+ input_end)
+                print("Selected interval:", interval)
+        else:
+            print("Cancelled")
         if ok :
             stockName ,ticker= selectedStock.split("-")
-            self.tabs.addTab(HistoricalPrice_Tab(ticker,stockName),QIcon("Source Images/chart-up.png"),ticker) # will be used if internet access is available
+            #self.tabs.addTab(HistoricalPrice_Tab(ticker,stockName),QIcon("Source Images/chart-up.png"),ticker) # will be used if internet access is available
+            self.tabs.addTab(HistoricalPrice_Tab(ticker,stockName,input_start,input_end,input_interval),QIcon("Source Images/chart-up.png"),ticker)
             #self.tabs.addTab(HistoricalPrice_Tab_CSV(ticker,stockName),QIcon("chart-up.png"),ticker) # will be used if internet access is not available
             #self.tabs.addTab(HistoricalPrice_Tab_Database(ticker,stockName),QIcon("Source Images/chart-up.png"),ticker)
             self.RecentStock = shelve.open('Data/Recent_Stock_data')

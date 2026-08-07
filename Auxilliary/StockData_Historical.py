@@ -11,9 +11,11 @@ from datetime import datetime
 class StockDataHist:
 
 
-    def __init__(self,ticker_symbol,period ,interval ):
+    def __init__(self,ticker_symbol,period,start,end ,interval ):
         self.ticker_symbol = ticker_symbol
         self.period = period #values can be 1d, 5d, 1wk, 1mo, 3mo
+        self.start = start
+        self.end = end
         self.interval = interval# values can be 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
         self.volume = None
         self.history_dataframe = None
@@ -38,7 +40,11 @@ class StockDataHist:
                     To access Volume data set the period at least 1week and interval at 1day,,,lesser cannot be access.
                 '''
                 ticker = yf.Ticker(self.ticker_symbol)
-                historical_data = ticker.history(period=self.period,interval = self.interval,prepost = True)  # price data
+                if self.start == None:
+                    historical_data = ticker.history(period=self.period,interval = self.interval,prepost = True)  # price data
+
+                else:
+                    historical_data = ticker.history(start=self.start,end=self.end,interval = self.interval,prepost = True)
 
                 if historical_data.empty:
                     raise Exception
