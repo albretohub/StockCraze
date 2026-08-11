@@ -1,13 +1,17 @@
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget,QVBoxLayout,QTabWidget
+import pandas as pd
+from datetime import datetime as dt
+import calendar as cal
+
 from UI.UI_ChartingTab import MainChart
 from UI.UI_VolumeDate_Chart import MainChart2
 from UI.UI_OpenHighLowClose_Charting import MainChart3
+
 from Auxilliary.StockData_CSV import Stock_CSV
 from Auxilliary.Database_Interface1 import Data_Interface
-from datetime import datetime as dt
-import calendar as cal
+from Auxilliary.StockData_Historical import StockDataHist as sd
 
 
 class MainChartingWindow(QWidget):
@@ -17,6 +21,12 @@ class MainChartingWindow(QWidget):
         self.StockSymbol = StockSymbol
         self.StockName = StockName
         self.formatted_dates = list()
+        self.date_data = None
+        self.open_data = None
+        self.close_data = None
+        self.volume_data = None
+        self.high_data = None
+        self.low_data = None
 
 
         #CSV_Data = Stock_CSV(StockSymbol,StockName)
@@ -24,8 +34,41 @@ class MainChartingWindow(QWidget):
        # CSV_Data.reverse_data()
         #CSV_Data.date_formatter()
 
-        database = Data_Interface(StockSymbol,StockName) # To be program with exception handling module befor charting commence
-        data_frame = database.SelectAll()
+        #database = Data_Interface(StockSymbol,StockName) # To be program with exception handling module befor charting commence
+        #data_frame = database.SelectAll()
+
+        try:
+            #data = sd(self.StockSymbol,'1mo','1d')
+            data = sd(self.StockSymbol,'1mo',str("2026-07-04"),str('2026-08-15'),'1d')
+            data.load_data()
+            data.show()
+            data = data.history_dataframe.drop('Dividends',axis =1)
+            data = data.drop('Stock Splits',axis =1)
+            indexes = data.index.strftime("%B %d,%Y")
+            data.index = indexes
+            data = data.round(4)
+            self.data_frame = pd.DataFrame(data)
+            #print(self.data_frame)
+
+
+            if len(self.data_frame)!= 0  :
+                self.date_data = self.data_frame.index.tolist()
+                formatted_dates = [dt.strptime(date, "%B %d,%Y").strftime("%b/%d/%y")for date in self.date_data]
+                self.date_data = formatted_dates
+                self.open_data = self.data_frame['Open']
+                self.high_data = self.data_frame['High']
+                self.low_data = self.data_frame['Low']
+                self.close_data = self.data_frame['Close']
+                self.volume_data = self.data_frame['Volume']
+                print(self.date_data)
+
+            else:
+                raise Exception
+
+        except Exception as e:
+            print("Importing data error! "+ str(e))
+            #self.label.setText("data not found ")
+            #self.layout1.addWidget(self.label)
 
         #data variables coupled with CSV data
         #self.date_data = CSV_Data.formatted_dates
@@ -36,12 +79,12 @@ class MainChartingWindow(QWidget):
         #self.volume_data = CSV_Data.volume_data
         #self.years = str(CSV_Data.year_range)
 
-        self.date_data = data_frame['Date']
-        self.open_data = data_frame['Open']
-        self.high_data = data_frame['High']
-        self.low_data = data_frame['Low']
-        self.close_data =data_frame['Close']
-        self.volume_data = data_frame['Volume']
+        #self.date_data = data_frame['Date']
+        #self.open_data = data_frame['Open']
+        #self.high_data = data_frame['High']
+        #self.low_data = data_frame['Low']
+        #self.close_data =data_frame['Close']
+        #self.volume_data = data_frame['Volume']
         self.year_range = None
 
         self.reverse_data()

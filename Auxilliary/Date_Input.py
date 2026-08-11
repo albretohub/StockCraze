@@ -130,14 +130,14 @@ class IntervalDialog(QDialog):
         super().__init__(parent)
 
         self.intervals = [
-            "1m",
-            "2m",
-            "5m",
-            "15m",
-            "30m",
-            "60m",
-            "90m",
-            "1h",
+            #"1m",
+            #"2m",
+            #"5m",
+            #"15m",
+            #"30m",
+            #"60m",
+            #"90m",
+            #"1h",
             "1d"
         ]
 
