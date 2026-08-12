@@ -15,7 +15,7 @@ from Auxilliary.StockData_Historical import StockDataHist as sd
 
 
 class MainChartingWindow(QWidget):
-    def __init__(self,StockSymbol,StockName):
+    def __init__(self,StockSymbol,StockName,start,end,interval):
         super().__init__()
         self.setWindowTitle("Charting Volume Vs Date")
         self.StockSymbol = StockSymbol
@@ -27,6 +27,9 @@ class MainChartingWindow(QWidget):
         self.volume_data = None
         self.high_data = None
         self.low_data = None
+        self.start = start
+        self.end = end
+        self.interval = interval
 
 
         #CSV_Data = Stock_CSV(StockSymbol,StockName)
@@ -39,7 +42,7 @@ class MainChartingWindow(QWidget):
 
         try:
             #data = sd(self.StockSymbol,'1mo','1d')
-            data = sd(self.StockSymbol,'1mo',str("2026-07-04"),str('2026-08-15'),'1d')
+            data = sd(self.StockSymbol,'1mo',self.start,self.end,self.interval)
             data.load_data()
             data.show()
             data = data.history_dataframe.drop('Dividends',axis =1)
@@ -87,7 +90,7 @@ class MainChartingWindow(QWidget):
         #self.volume_data = data_frame['Volume']
         self.year_range = None
 
-        self.reverse_data()
+        #self.reverse_data()
         self.date_formatter()
 
 
