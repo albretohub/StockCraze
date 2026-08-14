@@ -198,13 +198,30 @@ class MainWindow(QMainWindow):
         MystockDialog.setFixedSize(500,200)
 
         selectedStock, ok =  MystockDialog.getItem(self, "Select Stock", "AI Assistant", nameAndticker, 0, False)
+
         if ok :
             stockName ,ticker= selectedStock.split("-")
-            self.tabs.addTab(Machine_learning(ticker,stockName),QIcon("Source Images/AI.png"),ticker)
-            self.RecentStock = shelve.open('Data/Recent_Stock_data')
-            current_stock = stockName + "(" + ticker + ")"
-            self.RecentStock['recent'] = current_stock
-            self.RecentStock.close()
+            start, end, ok2 = dr.getDateRange(title="Choose Report Dates")
+            input_start = start.toString("yyyy-MM-dd")
+            input_end = end.toString("yyyy-MM-dd")
+            input_interval = '1d'
+
+            if ok2:
+                interval, ok2 = id.getInterval()
+                input_interval = interval
+                if ok2:
+                    print("Start: "+input_start)
+                    print("End:  "+ input_end)
+                    print("Selected interval:", interval)
+
+                    self.tabs.addTab(Machine_learning(ticker,stockName,input_start,input_end,input_interval),QIcon("Source Images/AI.png"),ticker)
+                    self.RecentStock = shelve.open('Data/Recent_Stock_data')
+                    current_stock = stockName + "(" + ticker + ")"
+                    self.RecentStock['recent'] = current_stock
+                    self.RecentStock.close()
+
+        else:
+            print("Cancelled")
 
 
     def stock_shelve(self):

@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import  QPushButton, QLabel, QToolBar, QAction, QStatusBar,
 from AI.AI_Correllation_Tab import Correllation as crln
 from AI.AI_ChartingPred_Actual import Pred_Act as pa
 from AI.AI_bestFeat_Closing import  bestfeatVSClosing as bf
+from Auxilliary.StockData_Historical import StockDataHist as sd
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import PolynomialFeatures
@@ -14,10 +15,15 @@ import pickle
 from datetime import datetime as dt
 
 class Machine_learning(QWidget):
-    def __init__(self,StockSymbol,StockName):
+    def __init__(self,StockSymbol,StockName,start,end,interval):
         super().__init__()
         self.StockName = StockName
         self.StockSymbol = StockSymbol
+        self.start = start
+        self.end = end
+        self.interval = interval
+        self.date_data = None
+
 
         self.filename = None
         self.message = QLabel()
@@ -46,11 +52,26 @@ class Machine_learning(QWidget):
 
     def import_data(self):
         try:
+            data = sd(self.StockSymbol,'1mo',str(self.start),str(self.end),self.interval)
+            data.load_data()
+            #data.show()
+            data = data.history_dataframe.drop('Dividends',axis =1)
+            data = data.drop('Stock Splits',axis =1)
+            indexes = data.index.strftime("%B %d,%Y")
+            data.index = indexes
+            data = data.round(4)
+            #self.main_dataframe = pd.DataFrame(data)
+
             database = di(self.StockSymbol,self.StockName)
             self.main_dataframe = database.SelectAll()
-            #print(self.main_dataframe)
+            print(self.main_dataframe)
             lenght = len(self.main_dataframe)
+            print(self.main_dataframe)
+            self.date_data =  self.main_dataframe.index.tolist()
+            self.date_range = str(str(self.date_data[0]) + " - " + str(self.date_data[lenght - 1]))
+
             self.date_range = str(self.main_dataframe['Date'].iloc[lenght-1] + ' - ' +str(self.main_dataframe['Date'].iloc[0]))
+
 
 
             if len(self.main_dataframe) == 0 :
@@ -60,6 +81,7 @@ class Machine_learning(QWidget):
                 self.correllation(self.main_dataframe)
                 self.Polynomial_Regression()
                 self.Sub_Tabs()
+
 
         except Exception as e:
             self.message.setText("Importing data error! "+ str(e)+" data not found ")
@@ -109,7 +131,7 @@ class Machine_learning(QWidget):
          #print(volume_diff)
 
     def correllation(self,dataframe):
-        dataframe = dataframe.drop('Date',axis=1)
+        dataframe = dataframe.reset_index(drop=True)
 
         #Create the NEXT closing price list ,change the last item as the average of close difference + the last item of close
         closing = list(dataframe['Close'])
