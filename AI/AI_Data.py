@@ -60,17 +60,14 @@ class Machine_learning(QWidget):
             indexes = data.index.strftime("%B %d,%Y")
             data.index = indexes
             data = data.round(4)
-            #self.main_dataframe = pd.DataFrame(data)
+            self.main_dataframe = data
 
-            database = di(self.StockSymbol,self.StockName)
-            self.main_dataframe = database.SelectAll()
-            print(self.main_dataframe)
+            #database = di(self.StockSymbol,self.StockName)
+            #self.main_dataframe = database.SelectAll()
             lenght = len(self.main_dataframe)
-            print(self.main_dataframe)
             self.date_data =  self.main_dataframe.index.tolist()
             self.date_range = str(str(self.date_data[0]) + " - " + str(self.date_data[lenght - 1]))
-
-            self.date_range = str(self.main_dataframe['Date'].iloc[lenght-1] + ' - ' +str(self.main_dataframe['Date'].iloc[0]))
+            #self.date_range = str(self.main_dataframe['Date'].iloc[lenght-1] + ' - ' +str(self.main_dataframe['Date'].iloc[0]))
 
 
 
@@ -118,10 +115,11 @@ class Machine_learning(QWidget):
              low_diff.append(float(low[i]- low[i-1]).__round__(2))
              volume_diff.append(float(volume[i]- volume[i-1]).__round__(2))
              i = i+1
+
          #print(close)
          #print(close_diff)
          self.Closing_diff = close_diff
-         #print(open)
+        # print(open)
          #print(open_diff)
          #print(high)
          #print(high_diff)
@@ -132,6 +130,7 @@ class Machine_learning(QWidget):
 
     def correllation(self,dataframe):
         dataframe = dataframe.reset_index(drop=True)
+        print(dataframe)
 
         #Create the NEXT closing price list ,change the last item as the average of close difference + the last item of close
         closing = list(dataframe['Close'])
@@ -214,8 +213,8 @@ class Machine_learning(QWidget):
             best.reverse()
             self.next_day_closing = list(self.next_day_closing)
             self.next_day_closing.reverse()
-            self.date_data= self.main_dataframe['Date']
-            self.date_data = list(self.date_data)
+            #self.date_data= self.main_dataframe['Date']
+            #self.date_data = list(self.date_data)
             self.date_data.reverse()
             self.date_formatter()
             self.sub_tabs.addTab(bf(self.StockSymbol,self.StockName,best,self.next_day_closing,self.corr_Indexes[0],
@@ -225,7 +224,7 @@ class Machine_learning(QWidget):
 
     def date_formatter(self):#Charting All Data
 
-        format = '%b/%d/%y'
+        format = '%B %d,%Y'
         print(format)
 
         date_str1 = dt.strptime(self.date_data[0],format)

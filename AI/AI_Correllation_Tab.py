@@ -14,7 +14,7 @@ class Correllation(QWidget):
         self.setStyleSheet("qproperty-alignment: AlignCenter ")
         self.date= QLabel("Date Range: "+date_range)
         self.date.setFont(QFont("Arial",15))
-        self.score.setText("Model Score: "+str(float(score*100).__round__(2))+ "%")
+        #self.score.setText("Model Score: "+str(float(score*100).__round__(2))+ "%")
         self.score.setFont(QFont("Arial",15))
         self.score.setStyleSheet("qproperty-alignment: AlignLeft;")
         self.main_layout.addWidget(self.score)
