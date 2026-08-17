@@ -205,6 +205,7 @@ class Machine_learning(QWidget):
             self.sub_tabs = QTabWidget()
             self.sub_tabs.setTabPosition(QTabWidget.North)
             self.sub_tabs.setMovable(True)
+            print("Score: "+ str(self.score))
             self.sub_tabs.addTab(crln(self.date_range,self.corr_Indexes,self.corr_values,self.score),QIcon("Source Images/AI.png"),"Correllation Table")
             self.sub_tabs.addTab(pa(self.StockSymbol,self.StockName,self.price_pred,self.actual_price,self.date_range),QIcon("Source Images/AI.png"),"Price Chart")
 
